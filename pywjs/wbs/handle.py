@@ -9,7 +9,7 @@ from websockets.legacy.server import WebSocketServerProtocol
 from pywjs.wbs.logger import ABC_logger
 from pywjs.wbs.allowed_func import Transaction, UserWbsFunc
 from pywjs.wbs.subscribe import UserWbsSubscribe
-from pywjs.wbs.cache import cache_add_key, cache_read_key, createBaseTableIfNotExist
+from pywjs.wbs.cache import Cache
 from pywjs.wbs.schema import ClientsWbsRequest, ClientsWbsRequest_GetInfoServer_id, ClientsWbsRequest_Mod, ClientsWbsRequest_ModAlternatives, ServerWbsResponse, WbsResponseCode
 # pip install jsonpickle
 import jsonpickle
@@ -69,13 +69,14 @@ class WbsHandle:
         # Этот список будем использовать для исполнения произвольных команд, в
         # функции `WbsHandle._exec_command`
         self._from_import_dict: dict[str, object] = {}
+        self.CacheObj = Cache(dbfile=self.path_user_cache)
 
     async def after_init(self):
         # Если указан путь для кеша пользователя, то инициализируем таблицы для
         # этого.
         if self.path_user_cache:
             # Инициализируем Таблицы для кеша пользователей, если их нет.
-            await createBaseTableIfNotExist(dbfile=self.path_user_cache)
+            await self.CacheObj._createBaseTableIfNotExist()
         return self
 
     async def handle(self, wbs: WebSocketServerProtocol, msg: str) -> tuple[str, str]:
@@ -361,7 +362,7 @@ class WbsHandle:
         if not self.path_user_cache:
             raise ValueError(
                 "Вы пытаетесь использовать пользовательский кеш не указав путь для БД в атрибут 'path_user_cache'")
-        res = await cache_add_key(self.path_user_cache, user, key, value)
+        res = await self.Cache.cache_add_key(user, key, value)
         return json.dumps(res)
 
     async def _cache_read_key(self, user: str, key: str) -> str:
@@ -371,7 +372,7 @@ class WbsHandle:
         if not self.path_user_cache:
             raise ValueError(
                 "Вы пытаетесь использовать пользовательский кеш не указав путь для БД в атрибут 'path_user_cache'")
-        res = await cache_read_key(self.path_user_cache, user, key)
+        res = await self.Cache.cache_read_key(user, key)
         return json.dumps(res)
 
     ##################################################################
