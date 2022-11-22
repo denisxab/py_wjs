@@ -41,59 +41,59 @@ date updated: 2022-11-22 23:20
 
    ```ts
    const wbs_obj = new Wbs("ЛюбойТокенКоторыйВыРазрешилиНаСервере", {
-       // Хост
-       host: "localhost",
-       // Порт
-       port: "9999",
-       // Функция для отправки сообщений на сервер
-       callback_onopen: () => {
-           /*
-     В этом примере мы отправляем запрос на сервер чтобы он посчитал 2+2
-     */
-           const command = "2+2";
-           wbs_obj.send({
-               mod: ClientsWbsRequest_Mod.exe,
-               h_id: 99,
-               uid_c: 0,
-               body: {
-                   exec: command,
-               },
-           });
-       },
-       // Функция для получения сообщений от сервера
-       callback_onmessage: (event: MessageEvent) => {
-           /*
-     Здесь мы получем все ответы от сервера.
+        // Хост
+        host: "localhost",
+        // Порт
+        port: "9999",
+        // Функция для отправки сообщений на сервер
+        callback_onopen: () => {
+            /*
+        В этом примере мы отправляем запрос на сервер чтобы он посчитал 2+2
+        */
+            const command = "2+2";
+            wbs_obj.send({
+                mod: ClientsWbsRequest_Mod.exe,
+                h_id: 99,
+                uid_c: 0,
+                body: {
+                    exec: command,
+                },
+            });
+        },
+        // Функция для получения сообщений от сервера
+        callback_onmessage: (event: MessageEvent) => {
+            /*
+        Здесь мы получем все ответы от сервера.
 
-     Чтобы можно было по разному обрабатывать ответы от сервера 
-     есть атрибут `h_id`, которые мы передаем в запрос, и на который получаем здесь.
-     */
-           const response_obj = <ServerWbsResponse>JSON.parse(event.data);
-           switch (response_obj.h_id) {
-               case 99:
-                   {
-                       alter(
-                           JSON.stringify(
-                               JSON.parse(response_obj.response),
-                               null,
-                               2
-                           )
-                       );
-                   }
-                   break;
-           }
-           /* wbs_obj.close(WbsCloseStatus.normal,'Пример Закрытия Соединения') */
-       },
-       // Функция обработка закрытия соединения с сервером
-       callback_onclose: undefined,
-       // Функция обработок ошибок при отправке на сервер
-       callback_onerror: undefined,
-       // Событие = Успешное подключение к серверу
-       event_connect: undefined,
-       // Событие = Не удалось подключиться к серверу
-       event_error_connect: undefined,
-       // Имя пользователя для этого клиента, используется в "кеш пользователя"
-       user: "ИмяПользователя",
+        Чтобы можно было по разному обрабатывать ответы от сервера 
+        есть атрибут `h_id`, которые мы передаем в запрос, и на который получаем здесь.
+        */
+            const response_obj = <ServerWbsResponse>JSON.parse(event.data);
+            switch (response_obj.h_id) {
+                case 99:
+                    {
+                        alter(
+                            JSON.stringify(
+                                JSON.parse(response_obj.response),
+                                null,
+                                2
+                            )
+                        );
+                    }
+                    break;
+            }
+            /* wbs_obj.close(WbsCloseStatus.normal,'Пример Закрытия Соединения') */
+        },
+        // Функция обработка закрытия соединения с сервером
+        callback_onclose: undefined,
+        // Функция обработок ошибок при отправке на сервер
+        callback_onerror: undefined,
+        // Событие = Успешное подключение к серверу
+        event_connect: undefined,
+        // Событие = Не удалось подключиться к серверу
+        event_error_connect: undefined,
+        // Имя пользователя для этого клиента, используется в "кеш пользователя"
+        user: "ИмяПользователя",
    });
    ```
 
@@ -112,7 +112,7 @@ date updated: 2022-11-22 23:20
       import { wbsStore } from "./wbsStore";
 
       export default createStore({
-          modules: { wbs: wbsStore },
+        modules: { wbs: wbsStore },
       });
       ```
 
@@ -120,14 +120,14 @@ date updated: 2022-11-22 23:20
 
       ```ts
       beforeCreate() {
-          this.$store.dispatch("wbs/initWebSocket", {
-              // Что сделать после подключения к серверу.
-              after_connect: () => {
-                  // Тут отправляем первые сообщения на сервер.
-              },
-              // Обработка события window.beforeunload. Здесь можно выполнять отчистку ресурсов.
-              destruction:()=>{}
-          });
+        this.$store.dispatch("wbs/initWebSocket", {
+            // Что сделать после подключения к серверу.
+            after_connect: () => {
+                // Тут отправляем первые сообщения на сервер.
+            },
+            // Обработка события window.beforeunload. Здесь можно выполнять отчистку ресурсов.
+            destruction:()=>{}
+        });
       },
       ```
 
@@ -137,19 +137,19 @@ date updated: 2022-11-22 23:20
 
      ```ts
      actions: {
-         ЛюбоеИмя({dispatch}){
-             dispatch(
-                 "wbs/send",
-                 {
-                     mod: ClientsWbsRequest_Mod.exec,
-                     h_id: 1,
-                     body: {
-                         exec = "2+2",
-                     },
-                 },
-                 { root: true }
-             );
-         }
+        ЛюбоеИмя({dispatch}){
+            dispatch(
+                "wbs/send",
+                {
+                    mod: ClientsWbsRequest_Mod.exec,
+                    h_id: 1,
+                    body: {
+                        exec = "2+2",
+                    },
+                },
+                { root: true }
+            );
+        }
      }
      ```
 
@@ -157,15 +157,15 @@ date updated: 2022-11-22 23:20
 
      ```ts
      methods: {
-         ЛюбоеИмя(){
-             this.$store.dispatch("wbs/send", {
-                 mod: ClientsWbsRequest_Mod.exec,
-                 h_id: 1,
-                 body: {
-                     exec = "2+2",
-                 },
-             });
-         }
+        ЛюбоеИмя(){
+            this.$store.dispatch("wbs/send", {
+                mod: ClientsWbsRequest_Mod.exec,
+                h_id: 1,
+                body: {
+                    exec = "2+2",
+                },
+            });
+        }
      }
      ```
 
@@ -176,10 +176,10 @@ date updated: 2022-11-22 23:20
 
      ```ts
      getters: {
-         ЛюбоеИмя(rootState) {
-             const r=rootState.wbs.res.value[1]
-             return r ? r : {};
-         }
+        ЛюбоеИмя(rootState) {
+            const r=rootState.wbs.res.value[1]
+            return r ? r : {};
+        }
      }
      ```
 
@@ -187,10 +187,10 @@ date updated: 2022-11-22 23:20
 
      ```ts
      computed: {
-         ЛюбоеИмя() {
-             const r=this.$store.state.wbs.res.value[1]
-             return r ? r : {};
-         }
+        ЛюбоеИмя() {
+            const r=this.$store.state.wbs.res.value[1]
+            return r ? r : {};
+        }
      }
      ```
 
@@ -230,21 +230,19 @@ date updated: 2022-11-22 23:20
       <PyjsLog v-model:isShow="isShow" :hids="hids" />
   </template>
   <script lang="ts">
-      import PyjsLog from "@/components/pyjs_log.vue";
-      import { Алиасы } from "./store/Хранилище";
-      export default {
-          components: { PyjsLog },
-          data() {
-              return {
-                  isShow: true, // Показать или скрыть подробное окно
-                  hids: Алиасы, // Алиасы для h_id. Об этом написаны в главе [[Использование алиасов для h_id]]
-              };
-          },
-      };
+    import PyjsLog from "@/components/pyjs_log.vue";
+    import { Алиасы } from "./store/Хранилище";
+    export default {
+        components: { PyjsLog },
+        data() {
+            return {
+                isShow: true, // Показать или скрыть подробное окно
+                hids: Алиасы, // Алиасы для h_id. Об этом написаны в главе [[Использование алиасов для h_id]]
+            };
+        },
+    };
   </script>
   ```
-
-  ![pyjs_log](_attachments/Pasted-image-20221031214211.png)
 
 ### Взаимодействие с сервером
 
@@ -254,13 +252,13 @@ date updated: 2022-11-22 23:20
 
   ```ts
   wbs_obj.send({
-      mod: ClientsWbsRequest_Mod.exec,
-      h_id: 99,
-      // uid_c:  Автоматически сгенерируется
-      body: {
-          exec = "2+2",
-      },
-      // t_send: Автоматически сгенерируется
+    mod: ClientsWbsRequest_Mod.exec,
+    h_id: 99,
+    // uid_c:  Автоматически сгенерируется
+    body: {
+    exec = "2+2",
+    },
+    // t_send: Автоматически сгенерируется
   });
   ```
 
@@ -279,17 +277,17 @@ date updated: 2022-11-22 23:20
   ```ts
   wbs_obj.send_transaction(
       {
-          mod: ClientsWbsRequest_Mod.func,
-          h_id: 99,
-          body: {
-              n_func: "os_exe_async", // Имя функцию которую вызвать
-              args: ["ls"], // Позиционные аргументы
-              kwargs: undefined, // Именованные аргументы
-          },
+        mod: ClientsWbsRequest_Mod.func,
+        h_id: 99,
+        body: {
+            n_func: "os_exe_async", // Имя функцию которую вызвать
+            args: ["ls"], // Позиционные аргументы
+            kwargs: undefined, // Именованные аргументы
+        },
       },
       // Это функция `rollback`
       (error_code: TRollbackErrorCode, h_id: number, uid_c: number) => {
-          alter("Rollback");
+        alter("Rollback");
       }
   );
   ```
@@ -307,22 +305,22 @@ date updated: 2022-11-22 23:20
       mod: ClientsWbsRequest_Mod.cache_read_key,
       h_id: 87,
       body: {
-          // Например: получаем путь к папке, в котрой пользователь был до закрытия страницы.
-          key: "ПрошлыйПуть",
+        // Например: получаем путь к папке, в котрой пользователь был до закрытия страницы.
+        key: "ПрошлыйПуть",
       },
       // ВТОРОЙ ЗАПРОС
       before: (last_res: ServerWbsResponse) => {
-          // Получаем прошлый путь из кеша
-          const last_path = JSON.parse(last_res);
-          wbs_obj.send({
-              mod: ClientsWbsRequest_Mod.func,
-              h_id: 99,
-              body: {
-                  // Например: Получим все файлы в указанной директории
-                  n_func: "ФункцияДляПолученияФайлов",
-                  kwargs: { path: last_path },
-              },
-          });
+        // Получаем прошлый путь из кеша
+        const last_path = JSON.parse(last_res);
+        wbs_obj.send({
+            mod: ClientsWbsRequest_Mod.func,
+            h_id: 99,
+            body: {
+                // Например: Получим все файлы в указанной директории
+                n_func: "ФункцияДляПолученияФайлов",
+                kwargs: { path: last_path },
+            },
+        });
       },
   });
   ```
@@ -478,13 +476,13 @@ wbs_obj.send({
 
   ```ts
   wbs_obj.send({
-      mod: ClientsWbsRequest_Mod.func,
-      h_id: 83,
-      body: {
-          n_func: "getFileFromPath", // Имя функцию которую вызвать
-          args: undefined, // Позиционные аргументы
-          kwargs: { path: "/home" }, // Именованные аргументы
-      },
+    mod: ClientsWbsRequest_Mod.func,
+    h_id: 83,
+    body: {
+        n_func: "getFileFromPath", // Имя функцию которую вызвать
+        args: undefined, // Позиционные аргументы
+        kwargs: { path: "/home" }, // Именованные аргументы
+    },
   });
   ```
 
@@ -492,13 +490,13 @@ wbs_obj.send({
 
   ```ts
   wbs_obj.send({
-      mod: ClientsWbsRequest_Mod.func,
-      h_id: 84,
-      body: {
-          n_func: "os_exe_async", // Имя функцию которую вызвать
-          args: ["ls"], // Позиционные аргументы
-          kwargs: undefined, // Именованные аргументы
-      },
+    mod: ClientsWbsRequest_Mod.func,
+    h_id: 84,
+    body: {
+        n_func: "os_exe_async", // Имя функцию которую вызвать
+        args: ["ls"], // Позиционные аргументы
+        kwargs: undefined, // Именованные аргументы
+    },
   });
   ```
 
@@ -581,14 +579,14 @@ wbs_obj.send({
 
   ```ts
   wbs_obj.send({
-      mod: ClientsWbsRequest_Mod.cache_add_key,
-      h_id: 87,
-      body: {
-          key:"ИмяКлюча"
-          value:ЗначениеКлюча // Это значение сериализуется в JSON
-          // # Если не указан, то возьмется из конструктора  `new Wbs(user="ИмяПользователя")`, если такого пользователя не существет, то создастся новый.
-          // user: "ИмяПользователя"
-      }
+    mod: ClientsWbsRequest_Mod.cache_add_key,
+    h_id: 87,
+    body: {
+        key:"ИмяКлюча"
+        value:ЗначениеКлюча // Это значение сериализуется в JSON
+        // # Если не указан, то возьмется из конструктора  `new Wbs(user="ИмяПользователя")`, если такого пользователя не существет, то создастся новый.
+        // user: "ИмяПользователя"
+    }
   });
   ```
 
@@ -596,13 +594,13 @@ wbs_obj.send({
 
   ```ts
   wbs_obj.send({
-      mod: ClientsWbsRequest_Mod.cache_read_key,
-      h_id: 87,
-      body: {
-          key: "ИмяКлюча",
-          // Если не указан, то возьмется из конструктора  `new Wbs(user="ИмяПользователя")`, если такого пользователя не существет, то будет ошибка.
-          // user: "ИмяПользователя"
-      },
+    mod: ClientsWbsRequest_Mod.cache_read_key,
+    h_id: 87,
+    body: {
+        key: "ИмяКлюча",
+        // Если не указан, то возьмется из конструктора  `new Wbs(user="ИмяПользователя")`, если такого пользователя не существет, то будет ошибка.
+        // user: "ИмяПользователя"
+    },
   });
   ```
 
@@ -624,22 +622,22 @@ wbs_obj.send({
   from Реализация import МоиФункции, МоиПодписки
 
   class UserWbsHandle(WbsHandle):
-      # Класс с разрешенными функции
-      allowed_func = МоиФункции
-      # Класс с "События на сервера"
-      allowed_subscribe = МоиПодписки
-      # Разрешенные токены для подключения
-      allowed_token = set(['ЛюбойТокенКоторыйВыРазрешилиНаСервере'])
-      # Путь для кеша пользователей (опционально)
-      path_user_cache = Path(__file__).parent / 'user_cache.sqlite'
-      # Определяем логер. По умолчанию используется https://pypi.org/project/logsmal/
-      logger: ABC_logger = defaultLogger(path_to_dir_log=Path(__file__).parent)
+        # Класс с разрешенными функции
+        allowed_func = МоиФункции
+        # Класс с "События на сервера"
+        allowed_subscribe = МоиПодписки
+        # Разрешенные токены для подключения
+        allowed_token = set(['ЛюбойТокенКоторыйВыРазрешилиНаСервере'])
+        # Путь для кеша пользователей (опционально)
+        path_user_cache = Path(__file__).parent / 'user_cache.sqlite'
+        # Определяем логер. По умолчанию используется https://pypi.org/project/logsmal/
+        logger: ABC_logger = defaultLogger(path_to_dir_log=Path(__file__).parent)
 
   host = "localhost"
   port = 9999
 
   if __name__ == '__main__':
-     asyncio.run(wbs_main_loop(host, port, UserWbsHandle))
+    asyncio.run(wbs_main_loop(host, port, UserWbsHandle))
   ```
 
   - `МоиФункции` [-> Доступные функции](#доступные-функции)
@@ -775,10 +773,10 @@ wbs_obj.send_transaction(
   ```python
   @Transaction._(rollback=ФункцияДляОтката)
   async def ИмяФункции(*args, **kwargs):
-      ... # Что то делаем.
-      if ... : # Что то пошло не так.
-          raise Transaction.TransactionError('СообщениеДляКлиента') # Вызываем ошибку в транзакции.
-      return ... # Если все хорошо, возвращаем ответ.
+    ... # Что то делаем.
+    if ... : # Что то пошло не так.
+        raise Transaction.TransactionError('СообщениеДляКлиента') # Вызываем ошибку в транзакции.
+    return ... # Если все хорошо, возвращаем ответ.
   ```
 
   - `ФункцияДляОтката`(Можно не указывать) - Эта функция вызовется, если произошло любое не обработанное исключение. Результат этой функции будет передан клиенту, вмести с описанием ошибки.
@@ -797,27 +795,26 @@ wbs_obj.send_transaction(
   from asyncio import create_subprocess_shell, subprocess
 
   class МоиПодписки(UserWbsSubscribe):
-
-      async def watchDir(self_, path: str):
-          """
-          Отслеживание изменений файлов и директорий в пути `path`
-          """
-          pre = [] # Инициализация локальных переменных
-          while await self_.live(sleep=2): # Бесконечный не блокирующий цикл событий, которые будет выполнятся через каждые `sleep`
-              f = os.listdir(path) # Отслеживания события
-              if pre != f: # Условия срабатывания события
-                  pre = f
-                  await self_.send(f) # Отправка сообщения всем подписчикам для указанной модификации
+    async def watchDir(self_, path: str):
+        """
+        Отслеживание изменений файлов и директорий в пути `path`
+        """
+        pre = [] # Инициализация локальных переменных
+        while await self_.live(sleep=2): # Бесконечный не блокирующий цикл событий, которые будет выполнятся через каждые `sleep`
+            f = os.listdir(path) # Отслеживания события
+            if pre != f: # Условия срабатывания события
+                pre = f
+                await self_.send(f) # Отправка сообщения всем подписчикам для указанной модификации
   ```
 
   Шаблон отслеживания "события на сервере"
 
   ```python
   async def ИмяФункции(self_, path: str):
-      ... # Инициализация локальных переменных
-      while await self_.live(sleep=СколькоЖдать): # Бесконечный не блокирующий цикл событий, которые будет выполнятся через каждые `sleep`
-       ... # Отслеживания события
-       if ... : # Условия срабатывания события
+    ... # Инициализация локальных переменных
+    while await self_.live(sleep=СколькоЖдать): # Бесконечный не блокирующий цикл событий, которые будет выполнятся через каждые `sleep`
+        ... # Отслеживания события
+        if ... : # Условия срабатывания события
         await self_.send(...)  # Отправка сообщения всем подписчикам для указанной модификации
   ```
 
@@ -942,25 +939,25 @@ class UserWbsHandle(WbsHandle):
 
   ```ts
   function getPath(): string {
-      if (window.location.pathname == "/") {
-          /*
-          Если вы используете сервер для разработчика на `vue`, то путь будет указываться не верно, он покажет url путь, а не путь к html файлу. Поэтому в этом случае укажем путь по умолчанию.
-          */
-          return "ПолныйПутьПоУмолчанию/raw";
-      }
-      /* Путь до папки с символьными файлами */
-      let pathDirLinks_ = window.location.pathname
-          .split(/[\/]/g)
-          .slice(0, -1);
-      let pathDirLinks = "";
-      if (window.location.pathname.search(/\\/g) >= 0) {
-          // Windows Файловая система
-          pathDirLinks = pathDirLinks_.join("\\") + "\\raw";
-      } else {
-          // UNIX файловая система
-          pathDirLinks = pathDirLinks_.join("/") + "/raw";
-      }
-      return pathDirLinks;
+    if (window.location.pathname == "/") {
+        /*
+        Если вы используете сервер для разработчика на `vue`, то путь будет указываться не верно, он покажет url путь, а не путь к html файлу. Поэтому в этом случае укажем путь по умолчанию.
+        */
+        return "ПолныйПутьПоУмолчанию/raw";
+    }
+    /* Путь до папки с символьными файлами */
+    let pathDirLinks_ = window.location.pathname
+        .split(/[\/]/g)
+        .slice(0, -1);
+    let pathDirLinks = "";
+    if (window.location.pathname.search(/\\/g) >= 0) {
+        // Windows Файловая система
+        pathDirLinks = pathDirLinks_.join("\\") + "\\raw";
+    } else {
+        // UNIX файловая система
+        pathDirLinks = pathDirLinks_.join("/") + "/raw";
+    }
+    return pathDirLinks;
   }
   ```
 
@@ -968,30 +965,30 @@ class UserWbsHandle(WbsHandle):
 
   ```python
   def createLinkToFile(pathFile: str, pathDirLinks: str, extendsFile: Literal['txt', 'pdf', 'png', 'jpg', 'webp']) -> str:
-      """Создать символьную ссылку на файл `pathFile`, и поместить ей в путь `pathDirLinks`
+    """Создать символьную ссылку на файл `pathFile`, и поместить ей в путь `pathDirLinks`
 
-      :param pathFile: Путь к файлу на который нужно сделать символьную ссылку
-      :param pathDirLinks: Путь к папке в которую нужно поместить символьную ссылку
-      :param extendsFile: Какое расширение должно быть у символьного файла, это влияет на то как браузер будет отображать этот файл.
-      :return: Имя символьного файла
+    :param pathFile: Путь к файлу на который нужно сделать символьную ссылку
+    :param pathDirLinks: Путь к папке в которую нужно поместить символьную ссылку
+    :param extendsFile: Какое расширение должно быть у символьного файла, это влияет на то как браузер будет отображать этот файл.
+    :return: Имя символьного файла
 
-      """
+    """
 
-      pathFile = Path(pathFile).resolve()
-      pathDirLinks = Path(pathDirLinks).resolve()
-      # Создаем путь если его нет
-      if not os.path.exists(pathDirLinks):
-          os.makedirs(pathDirLinks)
-      # Имя ссылки = `link_ЗахешированныйПолныйПутьMD5__ИсходноеРасширениеФайла_.расширение`
-      nameLinkFile: str = f"link_{hashlib.md5(str(pathFile).encode('utf-8')).hexdigest()}__{pathFile.suffix.lower().replace('.','_')}.{extendsFile}"
-      absPathLink = pathDirLinks/nameLinkFile
+    pathFile = Path(pathFile).resolve()
+    pathDirLinks = Path(pathDirLinks).resolve()
+    # Создаем путь если его нет
+    if not os.path.exists(pathDirLinks):
+        os.makedirs(pathDirLinks)
+    # Имя ссылки = `link_ЗахешированныйПолныйПутьMD5__ИсходноеРасширениеФайла_.расширение`
+    nameLinkFile: str = f"link_{hashlib.md5(str(pathFile).encode('utf-8')).hexdigest()}__{pathFile.suffix.lower().replace('.','_')}.{extendsFile}"
+    absPathLink = pathDirLinks/nameLinkFile
 
-      if absPathLink.exists():
-          if not absPathLink.is_symlink():
-              absPathLink.symlink_to(pathFile)
-      else:
-          absPathLink.symlink_to(pathFile)
-      return str(absPathLink.name)
+    if absPathLink.exists():
+        if not absPathLink.is_symlink():
+            absPathLink.symlink_to(pathFile)
+    else:
+        absPathLink.symlink_to(pathFile)
+    return str(absPathLink.name)
   ```
 
 - Использование в HTML (Это краткий, и условный пример)
@@ -1004,16 +1001,16 @@ class UserWbsHandle(WbsHandle):
   <!-- Если это Текстовый файл -->
   <div id="textDiv"></div>
   <script>
-      /* Прочитать локальный ссылочный файл */
-      function readFile(pathLink) {
-          fetch(pathLink)
-              .then((response) => response.text())
-              .then((text) => {
-                  // @ts-ignore
-                  this.textFile = text;
-              });
-      }
-      textDiv = readFile("Путь.txt");
+    /* Прочитать локальный ссылочный файл */
+    function readFile(pathLink) {
+        fetch(pathLink)
+            .then((response) => response.text())
+            .then((text) => {
+                // @ts-ignore
+                this.textFile = text;
+            });
+    }
+    textDiv = readFile("Путь.txt");
   </script>
   ```
 
