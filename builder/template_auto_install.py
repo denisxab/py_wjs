@@ -43,7 +43,7 @@ def step1(path_app: Path):
 def step2(path_env: Path):
     # Создаем виртуально окружение в папке `./venv`
     v = venv.EnvBuilder(with_pip=True, upgrade_deps=True)
-    v.create(str(path_env))
+    v.create(str(path_env)) 
     # Устанавливаем зависимости из `requirements.txt
     context = v.ensure_directories(str(path_env))
     return context.env_exec_cmd
