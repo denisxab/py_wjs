@@ -47,6 +47,18 @@ class WbsHandle:
     # (если вам не нужно работать с кешем пользователей то не указывайте путь)
     def path_user_cache(self) -> Optional[Path]: ...
 
+    @abc.abstractmethod
+    # Заполнить кеш пользователя значениями по умолчанию
+    def init_user_cache(self) -> dict[str, dict[str, str]]:
+        """ 
+        return {
+            "ИмяПользователя": {
+                'Ключ': 'Значение'
+            }
+        }
+        """
+        ...
+
     @property
     @abc.abstractmethod
     # Логер
@@ -76,7 +88,7 @@ class WbsHandle:
         # этого.
         if self.path_user_cache:
             # Инициализируем Таблицы для кеша пользователей, если их нет.
-            await self.CacheObj._createBaseTableIfNotExist()
+            await self.CacheObj._createBaseTableIfNotExist(callable_init_user_cache=self.init_user_cache)
         return self
 
     async def handle(self, wbs: WebSocketServerProtocol, msg: str) -> tuple[str, str]:
@@ -362,7 +374,7 @@ class WbsHandle:
         if not self.path_user_cache:
             raise ValueError(
                 "Вы пытаетесь использовать пользовательский кеш не указав путь для БД в атрибут 'path_user_cache'")
-        res = await self.Cache.cache_add_key(user, key, value)
+        res = await self.CacheObj.cache_add_key(user, key, value)
         return json.dumps(res)
 
     async def _cache_read_key(self, user: str, key: str) -> str:
@@ -372,7 +384,7 @@ class WbsHandle:
         if not self.path_user_cache:
             raise ValueError(
                 "Вы пытаетесь использовать пользовательский кеш не указав путь для БД в атрибут 'path_user_cache'")
-        res = await self.Cache.cache_read_key(user, key)
+        res = await self.CacheObj.cache_read_key(user, key)
         return json.dumps(res)
 
     ##################################################################

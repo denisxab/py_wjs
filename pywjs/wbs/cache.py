@@ -62,7 +62,7 @@ class Cache:
 
     def __init__(self, dbfile: str) -> None:
         self.dbfile = dbfile
-        self.sql = SQLite()
+        self.sql = SQLite(self.dbfile)
 
     async def cache_add_key(self, user_name: str, key: str, value: str) -> tuple[int, str]:
         """
@@ -76,7 +76,7 @@ class Cache:
         #
         # Проверяем наличия пользователя в Таблице users, если его нет то добавляем
         #
-        iduser: int = await Cache._check_or_add_user(user_name)
+        iduser: int = await self._check_or_add_user(user_name)
         #
         # Получаем хеш значения
         #
@@ -131,16 +131,18 @@ class Cache:
         # Выясняем почему пустой ответ
         else:
             # Проверяем наличие пользователя
-            if not await Cache._check_or_add_user(user_name, CREATE_NEW_USER=False):
+            if not await self._check_or_add_user(user_name, CREATE_NEW_USER=False):
                 raise ValueError(f"Пользователь '{user_name}' не существует")
             # Проверяем наличие ключа
-            if not await Cache._check_exist_key(user_name, key):
-                raise ValueError(f"Ключ'{key}' не существует")
+            if not await self._check_exist_key(user_name, key):
+                raise ValueError(f"Ключ '{key}' не существует")
         return res
 
-    async def _createBaseTableIfNotExist(self):
+    async def _createBaseTableIfNotExist(self, callable_init_user_cache: Callable):
         """
         Создать базовые таблицы в БД, если их нет
+
+        callable_init_user_cache: Функция заполнения кеша по умолчанию
         """
         query = """
         SELECT
@@ -188,14 +190,22 @@ class Cache:
             # По умолчанию создаем пользователя `base`
             default_user = """insert into users (name) values ('base');"""
             #
-            #
+            # Создание таблиц
             #
             for table in users, main, data, *index.split(';'), *default_user.split(';'):
                 await self.sql.sql_write(table)
+            #
+            # Добавление значений по умолчанию в таблицу
+            #
+            init_user_cache = callable_init_user_cache()
+            if init_user_cache:
+                for user, v1 in init_user_cache.items():
+                    for key, value in v1.items():
+                        await self.cache_add_key(
+                            user_name=user, key=key, value=value)
             return True
         return False
 
-    @staticmethod
     async def _check_or_add_user(self, user_name: str, CREATE_NEW_USER=True) -> int:
         iduser = await self.sql.sql_read("select iduser from users where name=:name", {"name": user_name})
         # Если такого пользователя нет
@@ -211,7 +221,6 @@ class Cache:
             iduser: int = iduser[0][0]
         return iduser
 
-    @staticmethod
     async def _check_exist_key(self, user_name: str, key: str) -> int:
         res = await self.sql.sql_read('select count(1) from main where user=:user and  key=:key', {"user": user_name, "key": key})
         if res:

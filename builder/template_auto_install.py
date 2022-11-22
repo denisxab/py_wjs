@@ -2,6 +2,7 @@
 Установка виртуального окружения `Python`, и зависимостей из файла `./requirements.txt`
 """
 
+import re
 import sys
 import venv
 import subprocess
@@ -26,12 +27,11 @@ def step1(path_app: Path):
             path_requirements=path_server/'requirements.txt'
         )
         step4(
-            path_env=path_env,
             path_uninstall=path_app / 'auto_uninstall.py'
         )
         step5(
-            path_app, path_run=path_app/'auto_run.py',
-            path_python=path_python, path_server=path_server
+            path_run=path_app/'auto_run.py',
+            path_python=path_python
         )
         step6(path_gitignore=path_app/'.gitignore')
     else:
@@ -58,11 +58,12 @@ def step3(path_python: str, path_requirements: Path):
 
 
 # 4. Создать файл для удаления venv
-def step4(path_env: Path, path_uninstall: Path):
+def step4(path_uninstall: Path):
     path_uninstall.write_text(f"""
+from pathlib import Path
 import shutil
 import time
-env_dir = '''{path_env}'''
+env_dir = Path(__file__).parent / 'server' / 'venv'
 
 check_int = str(time.time_ns() % 100)
 r = input(f'Для подтверждения удаления, введите число:\\n\\n{{check_int}}:\\t')
@@ -75,14 +76,19 @@ else:
 
 
 # 5. Создать файл для запуска программы
-def step5(path_app: Path, path_run: Path, path_python: Path, path_server: Path):
+def step5(path_run: Path, path_python: Path):
+    # Относительный путь к venv
+    path_python = re.sub('.+(venv.+)', '\g<1>', path_python)
     path_run.write_text(f"""
+from pathlib import Path
 import webbrowser
 import os
+
+sdir = Path(__file__).parent 
 # Запустить html файл, в браузере по умолчанию
-webbrowser.open('file://' + '{ path_app / 'client' / 'index.html'}')
+webbrowser.open(f"file://{{sdir / 'client' / 'index.html'}}")
 # Запустить файл `main.py`
-os.system('{path_python} {path_server/'main.py'}')
+os.system(f"{{sdir / 'server' / '{path_python}'}} {{sdir /'server'/ 'main.py'}}")
     """)
 
 
