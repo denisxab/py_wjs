@@ -1,5 +1,5 @@
 """
-Установка виртуального окружения `Python`, и зависимостей из файла `./requirements.txt`
+Установка виртуального окружения `Python`, и зависимостей из файла `./pyproject.toml`
 """
 
 import re
@@ -24,7 +24,8 @@ def step1(path_app: Path):
         path_python = step2(path_env=path_env)
         step3(
             path_python=path_python,
-            path_requirements=path_server/'requirements.txt'
+            path_pyproject=path_server,
+            path_server=path_server
         )
         step4(
             path_uninstall=path_app / 'auto_uninstall.py'
@@ -43,18 +44,23 @@ def step1(path_app: Path):
 def step2(path_env: Path):
     # Создаем виртуально окружение в папке `./venv`
     v = venv.EnvBuilder(with_pip=True, upgrade_deps=True)
-    v.create(str(path_env)) 
-    # Устанавливаем зависимости из `requirements.txt
+    v.create(str(path_env))
     context = v.ensure_directories(str(path_env))
     return context.env_exec_cmd
 
 
-# 3. Установить зависимости из файла `./requirements.txt` в ВО
-def step3(path_python: str, path_requirements: Path):
-    for lib in path_requirements.read_text().split('\n'):
-        if lib:
-            cmd = [path_python, '-m', 'pip', 'install', lib]
-            subprocess.check_call(cmd)
+# 3. Установить зависимости из файла `./pyproject.toml` в ВО
+def step3(path_python: str, path_pyproject: Path, path_server: Path):
+    # Установка `poetry`
+    subprocess.check_call([path_python, '-m', 'pip', 'install', 'poetry'])
+    # Обновить файлы блокировки
+    subprocess.run(
+        [path_python, '-m', 'poetry', 'lock'], cwd=path_server,
+    )
+    # Синхронизируем модули с файлом `pyproject.toml`
+    subprocess.run(
+        [path_python, '-m', 'poetry', 'install', '--sync'], cwd=path_server,
+    )
 
 
 # 4. Создать файл для удаления venv
@@ -99,7 +105,6 @@ def step6(path_gitignore: Path):
 __pycache__
 log
 server/venv
-node_modules
 *.log
 *.sqlite
     """)
