@@ -54,8 +54,10 @@ class UserWbsSubscribeData:
         self._live_subscribers: dict[str, set[str]] = {}
         # Используется для отправки сообщений клиентам:
         # {ИмяФункции:{Модификация:{WbsID:ClientsSubscriber}}}
-        self._send_subscribers: dict[str, dict[str,
-                                               dict[str, deque[ClientsSubscriber]]]] = {}
+        self._send_subscribers: dict[
+            str,
+            dict[str, dict[str, deque[ClientsSubscriber]]]
+        ] = {}
         # На что подписан указанный пользователь:
         # {WbsID:{ИмяФункции:set(Модификация)}}
         self._user_subscriber: dict[str, dict[str, set[str]]] = {}
@@ -107,8 +109,9 @@ class UserWbsSubscribeData:
             )
             return "Create", self_
 
-    def check_subscriber(self, wbs_id: str, name_event: str,
-                         mod: str, user_sub: bool):
+    def check_subscriber(
+            self, wbs_id: str, name_event: str,
+            mod: str, user_sub: bool):
         """
         Проверяем существования такой подписки
 
@@ -126,8 +129,9 @@ class UserWbsSubscribeData:
             raise KeyError(
                 f'Вы не подписаны на событие "{name_event}" с модификацией "{mod}"')
 
-    def subscriber_event(self, wbs: WebSocketServerProtocol,
-                         request_obj: ClientsWbsRequest, name_event: str, mod: str):
+    def subscriber_event(
+            self, wbs: WebSocketServerProtocol,
+            request_obj: ClientsWbsRequest, name_event: str, mod: str):
         """
         Добавить клиента в подписчики для события(name_event) с модификацией(mod)
         """
@@ -335,7 +339,7 @@ class UserWbsSubscribe:
     @classmethod
     async def send_all_subscribers(cls, msg: str, *, name_event: str, mod: str):
         """
-        Отправляем сообщение все подписчикам, для указного события(name_event) с указной модификацией(mod)
+        Отправляем сообщение всем подписчикам, для указного события(name_event) с указной модификацией(mod)
         """
         for wbs_id, subscriber in cls.o_UserWbsSubscribeData.get_send_subscribers(
                 name_event, mod).items():
