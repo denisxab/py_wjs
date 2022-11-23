@@ -99,6 +99,7 @@ def step6(path_gitignore: Path):
 __pycache__
 log
 server/venv
+node_modules
 *.log
 *.sqlite
     """)
