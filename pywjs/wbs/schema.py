@@ -39,6 +39,8 @@ class WbsCloseStatus(Enum):
     # 4000-4999 Свободные коды
     # Ошибка аутентификации
     authentication_error = 4001
+    # Разрыв соединения для подключения к другому url
+    disconnect_then_reconnect_new_url = 4002
 
 
 class ClientsWbsRequest_Mod(Enum):
