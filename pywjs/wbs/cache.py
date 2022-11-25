@@ -211,8 +211,8 @@ class Cache:
             index = """CREATE UNIQUE INDEX users_name ON users (name);"""
             # По умолчанию создаем пользователя `base`
             default_user = """
-            insert into users (name) values ('base');
             insert into users (name) values ('app');
+            insert into users (name) values ('base');
             """
             #
             # Создание таблиц
