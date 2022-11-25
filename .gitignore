@@ -7,3 +7,4 @@ venv
 /dist
 builder/builder/node_modules/*
 builder/builder/node_modules
+_tst.py
