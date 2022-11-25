@@ -655,23 +655,22 @@ wbs_obj.send({
   ```python
   import asyncio
   from pathlib import Path
-  from wbs.wbs_server import wbs_main_loop
-  from wbs.wbs_handle import WbsHandle
-  from wbs.wbs_logger import ABC_logger, defaultLogger
-
+  from pywjs.wbs.server import wbs_main_loop
+  from pywjs.wbs.handle import WbsHandle
+  from pywjs.wbs.logger import ABC_logger, defaultLogger
   from Реализация import МоиФункции, МоиПодписки
 
   class UserWbsHandle(WbsHandle):
-        # Класс с разрешенными функции
-        allowed_func = МоиФункции
-        # Класс с "События на сервера"
-        allowed_subscribe = МоиПодписки
-        # Разрешенные токены для подключения
-        allowed_token = set(['ЛюбойТокенКоторыйВыРазрешилиНаСервере'])
-        # Путь для кеша пользователей (опционально)
-        path_user_cache = Path(__file__).parent / 'user_cache.sqlite'
-        # Определяем логер. По умолчанию используется https://pypi.org/project/logsmal/
-        logger: ABC_logger = defaultLogger(path_to_dir_log=Path(__file__).parent)
+    # Класс с разрешенными функции
+    allowed_func = МоиФункции
+    # Класс с "События на сервера"
+    allowed_subscribe = МоиПодписки
+    # Разрешенные токены для подключения
+    allowed_token = set(['ЛюбойТокенКоторыйВыРазрешилиНаСервере'])
+    # Путь для кеша пользователей (опционально)
+    path_user_cache = Path(__file__).parent / 'user_cache.sqlite'
+    # Определяем логер. По умолчанию используется https://pypi.org/project/logsmal/
+    logger: ABC_logger = defaultLogger(path_to_dir_log=Path(__file__).parent)
 
   host = "localhost"
   port = 9999
@@ -697,7 +696,7 @@ import os
 import pwd
 import stat
 from datetime import datetime
-from wbs.wbs_allowed_func import UserWbsFunc
+from pywjs.wbs.allowed_func import Transaction, UserWbsFunc
 from asyncio import create_subprocess_shell, subprocess
 
 
@@ -835,7 +834,7 @@ wbs_obj.send_transaction(
   ```python
   import os
   from datetime import datetime
-  from wbs.wbs_subscribe import UserWbsSubscribe
+  from pywjs.wbs.subscribe import UserWbsSubscribe
   from asyncio import create_subprocess_shell, subprocess
 
   class МоиПодписки(UserWbsSubscribe):
@@ -895,12 +894,14 @@ class UserWbsHandle(WbsHandle):
 По умолчанию для логирование на сервере использует [logsmal](https://pypi.org/project/logsmal/), её создал тот же автор, что и `PywJs`. **Его основное предназначения для отладки и дебага программы**, если вам нужно что то большее, то можете использовать `logging` and `loguru`.
 
 ```python
-from wbs.wbs_logger import ABC_logger, defaultLogger
+from pywjs.wbs.logger import ABC_logger, defaultLogger,EmptyLogger
 
 class UserWbsHandle(WbsHandle):
     # Определяем логер. По умолчанию используется https://pypi.org/project/logsmal/
     logger: ABC_logger = defaultLogger(path_to_dir_log=Path(__file__).parent)
 ```
+
+Или же если вам нужно отключить логирование(игнорировать все вызовы логера), то укажите `logger=EmptyLogger`
 
 #### Переопределение логгера по умолчанию
 
@@ -1073,4 +1074,7 @@ class UserWbsHandle(WbsHandle):
 
 Задач нет
 
+- Сдлеать логер которые ничего не выводит
+- Добавить в пользовательский кеш специального пользователя `app`, который будет хранить настройки всего проекта. В нем будуд зарезервир имена(они начинаются с нижнего подчеркивания `_ИмяКлюча`) которые нельзя изменять через `cache_add_key`, о изменяется системено.
+- Продумать мехониз авто создания базу в случаи её удаления.
 - Продумать обновление программы

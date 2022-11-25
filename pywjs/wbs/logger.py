@@ -10,6 +10,7 @@ class ABC_loglevel(abc.ABC):
 
 
 class ABC_logger(abc.ABC):
+    """Абстрактный класс(интерфейс) для логера"""
     success: ABC_loglevel
     info: ABC_loglevel
     debug: ABC_loglevel
@@ -17,7 +18,17 @@ class ABC_logger(abc.ABC):
     errordet: ABC_loglevel
 
 
+class EmptyLogger:
+    """Пустой логер. Вызовы логера будут игнорироваться"""
+    success = lambda *args, **kwargs: None
+    info = lambda *args, **kwargs: None
+    debug = lambda *args, **kwargs: None
+    error = lambda *args, **kwargs: None
+    errordet = lambda *args, **kwargs: None
+
+
 def defaultLogger(path_to_dir_log: Path) -> ABC_logger:
+    """Логер по умолчанию"""
     #
     # Настройки логера. Используется https://pypi.org/project/logsmal/
     #

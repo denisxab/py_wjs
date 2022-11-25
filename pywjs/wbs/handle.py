@@ -34,22 +34,22 @@ class WbsHandle:
     @property
     @abc.abstractmethod
     # Класс для хранения доступных функций
-    def allowed_func(self) -> UserWbsFunc: ...
+    def allowed_func(self) -> Optional[UserWbsFunc]: ...
 
     @property
     @abc.abstractmethod
     # Класс для хранения доступных подписок
-    def allowed_subscribe(self) -> UserWbsSubscribe: ...
+    def allowed_subscribe(self) -> Optional[UserWbsSubscribe]: ...
 
     @property
     @abc.abstractmethod
     # Путь для БД с кешем пользователей
     # (если вам не нужно работать с кешем пользователей то не указывайте путь)
-    def path_user_cache(self) -> Optional[Path]: ...
+    def path_user_cache(self) -> Path: ...
 
     @abc.abstractmethod
     # Заполнить кеш пользователя значениями по умолчанию
-    def init_user_cache(self) -> dict[str, dict[str, str]]:
+    def init_user_cache(self) -> Optional[dict[str, dict[str, str]]]:
         """ 
         return {
             "ИмяПользователя": {
