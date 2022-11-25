@@ -3,6 +3,7 @@
 """
 
 import hashlib
+import os
 from typing import Any, Callable
 import aiosqlite
 
@@ -12,8 +13,11 @@ __all__ = ["Cache"]
 class SQLite:
     """Взаимодействие с SQLite"""
 
-    def __init__(self, dbfile: str) -> None:
-        self.dbfile = dbfile
+    def __init__(self, dbfile: str, callback_recovery: Callable) -> None:
+        # Абсолютный путь к БД
+        self.dbfile: str = dbfile
+        # Функция для восстановления БД
+        self.callback_recovery: Callable = callback_recovery
 
     def sql_get_db(self):
         """
@@ -29,14 +33,19 @@ class SQLite:
             return transaction_dec
         return wrapper
 
-    async def sql_write(self, query: str, args: dict = {}, RETURNING: bool = False) -> bool:
+    async def sql_write(self, query: str, args: dict = {}, RETURNING: bool = False, skip_exist=False) -> bool:
         """Выполнить команду на запись
 
         :param dbfile: файл к БД
         :param query: Команда
         :param args: Аргументы в строку запроса
         :param RETURNING: Нужно ли получать ответ после вставки записи
+        :param skip_exist: Если True то пропустить проверку существования файла
         """
+        # Если нет БД, то вызвать восстановление БД
+        if not skip_exist and not os.path.exists(self.dbfile):
+            await self.callback_recovery(self.dbfile)
+
         async with aiosqlite.connect(self.dbfile) as db:
             if RETURNING:
                 res = await db.execute(query, args)
@@ -47,12 +56,17 @@ class SQLite:
                 await db.execute(query, args)
                 return await db.commit()
 
-    async def sql_read(self, query: str, args: dict = {}) -> list[tuple]:
+    async def sql_read(self, query: str, args: dict = {}, skip_exist=False) -> list[tuple]:
         """Выполнить команду на чтение
 
         :param dbfile: файл к БД
         :param query: SQL запрос
+        :param skip_exist: Если True то пропустить проверку существования файла
         """
+        # Если нет БД, то вызвать восстановление БД
+        if not skip_exist and not os.path.exists(self.dbfile):
+            await self.callback_recovery(self.dbfile)
+
         async with aiosqlite.connect(self.dbfile) as db:
             async with db.execute(query, args) as cursor:
                 return await cursor.fetchall()
@@ -60,9 +74,17 @@ class SQLite:
 
 class Cache:
 
-    def __init__(self, dbfile: str) -> None:
+    def __init__(self, dbfile: str, callable_init_user_cache: Callable[[None], dict[str, dict[str, str]]]) -> None:
+        """
+        dbfile: Путь к БД
+        callable_init_user_cache: Функция заполнения кеша по умолчанию
+        """
         self.dbfile = dbfile
-        self.sql = SQLite(self.dbfile)
+        self.callable_init_user_cache = callable_init_user_cache
+        self.sql = SQLite(
+            self.dbfile,
+            # Функция для восстановления БД, в случае если БД удалена(или нет БД по указному пути).
+            callback_recovery=self._createBaseTableIfNotExist)
 
     async def cache_add_key(self, user_name: str, key: str, value: str) -> tuple[int, str]:
         """
@@ -82,13 +104,12 @@ class Cache:
         #
         hash_sha256: str = hashlib.sha256(value.encode('utf-8')).hexdigest()
         # Проверка наличие такого хеша
-        query = """
+        is_exist_row = await self.sql.sql_read("""
         select count(1),coalesce(d.idkey,-1),m.idkey
         from main m
         left join data d on m.idkey = d.idkey and d.hash = :hash
         where m.user=:iduser and m.key=:key
-        """
-        is_exist_row = await self.sql.sql_read(query, {"iduser": iduser, "key": key, "hash": hash_sha256})
+        """, {"iduser": iduser, "key": key, "hash": hash_sha256})
         # Если запись не существует в БД
         if is_exist_row[0][0] == 0:
             # Сначала записываем пользовательские данные, получем id новой записи
@@ -107,7 +128,7 @@ class Cache:
         elif is_exist_row[0][1] < 0:
             if not is_exist_row[0][2]:
                 raise ValueError('Нет idkey')
-            # Обновляем только данные, не трогая связующие таблицу
+            # Обновляем только данные в столбце `data.json`, не трогая связующие таблицы.
             await self.sql.sql_write("""update data set json=:value, hash=:hash where idkey=:idkey""", {"value": value, "hash": hash_sha256, "idkey": is_exist_row[0][2]})
             return -2, "Запись уже существует, и она обновлена"
         # Если запись существует, и хеш одинаковый
@@ -127,6 +148,7 @@ class Cache:
         """
         res = await self.sql.sql_read(query, {"user": user_name, "key": key})
         if res:
+            # Вернуть столбец `data.json`
             return res[0][0]
         # Выясняем почему пустой ответ
         else:
@@ -138,24 +160,24 @@ class Cache:
                 raise ValueError(f"Ключ '{key}' не существует")
         return res
 
-    async def _createBaseTableIfNotExist(self, callable_init_user_cache: Callable):
+    async def _createBaseTableIfNotExist(self, *args, **kwargs):
         """
-        Создать базовые таблицы в БД, если их нет
+        Создать базовые таблицы в БД, если их нет. А также добавить записи по умолчанию.
+        """
+        res = None
+        if os.path.exists(self.dbfile):
+            query = """
+            SELECT
+                name
+            FROM
+                sqlite_schema
+            WHERE
+                type ='table' AND
+                name NOT LIKE 'sqlite_%';
+            """
+            res = await self.sql.sql_read(query, skip_exist=True)
 
-        callable_init_user_cache: Функция заполнения кеша по умолчанию
-        """
-        query = """
-        SELECT
-            name
-        FROM
-            sqlite_schema
-        WHERE
-            type ='table' AND
-            name NOT LIKE 'sqlite_%';
-        """
-        res = await self.sql.sql_read(query)
-
-        if not res and [x[0] for x in res] != ['users', 'main', 'data']:
+        if not res or [x[0] for x in res] != ['users', 'main', 'data']:
             # Хранение имени пользователя
             users = """
             CREATE TABLE IF NOT EXISTS users (
@@ -188,16 +210,19 @@ class Cache:
             # Дополнительные индексы в таблицы
             index = """CREATE UNIQUE INDEX users_name ON users (name);"""
             # По умолчанию создаем пользователя `base`
-            default_user = """insert into users (name) values ('base');"""
+            default_user = """
+            insert into users (name) values ('base');
+            insert into users (name) values ('app');
+            """
             #
             # Создание таблиц
             #
             for table in users, main, data, *index.split(';'), *default_user.split(';'):
-                await self.sql.sql_write(table)
+                await self.sql.sql_write(table, skip_exist=True)
             #
             # Добавление значений по умолчанию в таблицу
             #
-            init_user_cache = callable_init_user_cache()
+            init_user_cache = self.callable_init_user_cache()
             if init_user_cache:
                 for user, v1 in init_user_cache.items():
                     for key, value in v1.items():
@@ -207,6 +232,7 @@ class Cache:
         return False
 
     async def _check_or_add_user(self, user_name: str, CREATE_NEW_USER=True) -> int:
+        """Проверит наличие пользователя, если его нет, то создать его"""
         iduser = await self.sql.sql_read("select iduser from users where name=:name", {"name": user_name})
         # Если такого пользователя нет
         if not iduser:
@@ -222,6 +248,7 @@ class Cache:
         return iduser
 
     async def _check_exist_key(self, user_name: str, key: str) -> int:
+        """Проверить наличие ключа"""
         res = await self.sql.sql_read('select count(1) from main where user=:user and  key=:key', {"user": user_name, "key": key})
         if res:
             return res[0][0]

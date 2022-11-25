@@ -81,14 +81,20 @@ class WbsHandle:
         # Этот список будем использовать для исполнения произвольных команд, в
         # функции `WbsHandle._exec_command`
         self._from_import_dict: dict[str, object] = {}
-        self.CacheObj = Cache(dbfile=self.path_user_cache)
+        self.CacheObj = Cache(
+            dbfile=self.path_user_cache,
+            callable_init_user_cache=self.init_user_cache
+        )
 
     async def after_init(self):
         # Если указан путь для кеша пользователя, то инициализируем таблицы для
         # этого.
         if self.path_user_cache:
             # Инициализируем Таблицы для кеша пользователей, если их нет.
-            await self.CacheObj._createBaseTableIfNotExist(callable_init_user_cache=self.init_user_cache)
+            await self.CacheObj._createBaseTableIfNotExist()
+        else:
+            raise FileNotFoundError(
+                'Не указан путь для "path_user_cache" -> Укажите путь для пользовательского кеша')
         return self
 
     async def handle(self, wbs: WebSocketServerProtocol, msg: str) -> tuple[str, str]:
