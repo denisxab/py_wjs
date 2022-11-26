@@ -85,6 +85,14 @@ class WbsHandle:
             dbfile=self.path_user_cache,
             callable_init_user_cache=self.init_user_cache
         )
+        #
+        # Расширение доступных функций через наследование классов.
+        #
+        for d in [x.__dict__ for x in self.allowed_func.__bases__ if x != AllowWbsFunc]:
+            for k, v in d.items():
+                if not k.startswith('_'):
+                    setattr(self.allowed_func, v.__qualname__, v)
+        # Добавляем в основной класс полный список доступных функций с учетом наследования.
 
     async def after_init(self):
         # Если указан путь для кеша пользователя, то инициализируем таблицы для

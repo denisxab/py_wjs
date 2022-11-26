@@ -1,5 +1,11 @@
+from asyncio import create_subprocess_shell
+from functools import wraps
+import hashlib
+import os
+from pathlib import Path
+import subprocess
 from types import CoroutineType, FunctionType
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 from websockets.legacy.server import WebSocketServerProtocol
 
 from pywjs.wbs.schema import ClientsWbsRequest, DT_HelpAllowed, ServerWbsResponse, WbsResponseCode
@@ -23,8 +29,8 @@ class AllowWbsFunc():
             k: DT_HelpAllowed(
                 annotations=str(v.__annotations__),
                 doc=str(v.__doc__),
-                name=str(v.__name__),
-                qualname=str(v.__qualname__)
+                module=str(v.__module__),
+                qualname=str(v.__qualname__),
             ).dict()
             for k, v in cls.__dict__.items()
             if type(v) == FunctionType or type(v) == classmethod
@@ -83,7 +89,7 @@ class AllowWbsFunc():
 
 
 class Transaction:
-    """Класс для реализации транзакции"""
+    """Класс для реализации транзакции в функциях"""
 
     class TransactionError(BaseException):
         ...
@@ -108,6 +114,7 @@ class Transaction:
         Декоратор для выполнения функции в режиме транзакции
         """
         def wrapper(fun):
+            @wraps(fun)
             async def transaction_dec(*arg, **kwargs) -> tuple[bool | BaseException, Any]:
                 res: tuple[bool, Any] = None
                 try:
@@ -129,3 +136,59 @@ class Transaction:
 
 class StdAllowWbsFunc:
     """Сборник функций для решения часто встречаемых задач, при создание десктопных программ"""
+
+    # Асинхронная функция
+    async def os_exe_async(command: str) -> dict:
+        """
+        Запустить/выполнить внешнюю команду(command) в оболочке, в асинхронном режиме.
+        """
+        # Выполняем команду
+        p = await create_subprocess_shell(
+            cmd=command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        # Получить результат выполнения команды
+        stdout, stderr = await p.communicate()
+        return dict(
+            stdout=stdout.decode(),
+            stderr=stderr.decode(),
+            cod=p.returncode,
+            cmd=command,
+        )
+
+    def createLinkToFile(pathFile: str, pathDirLinks: str, extendsFile: Literal['txt', 'pdf', 'png', 'jpg', 'webp']) -> str:
+        """Создать символьную ссылку на файл `pathFile`, и поместить ей в путь `pathDirLinks`
+
+        :param pathFile: Путь к файлу на который нужно сделать символьную ссылку
+        :param pathDirLinks: Путь к папке в которую нужно поместить символьную ссылку
+        :return: Имя символьного файла
+        """
+
+        pathFile = Path(pathFile).resolve()
+        pathDirLinks = Path(pathDirLinks).resolve()
+        # Создаем путь если его нет
+        if not os.path.exists(pathDirLinks):
+            os.makedirs(pathDirLinks)
+        # Имя ссылки = `link_ЗахешированныйПолныйПутьMD5__ИсходноеРасширениеФайла_.расширение`
+        nameLinkFile: str = f"link_{hashlib.md5(str(pathFile).encode('utf-8')).hexdigest()}__{pathFile.suffix.lower().replace('.','_')}.{extendsFile}"
+        absPathLink = pathDirLinks/nameLinkFile
+
+        if absPathLink.exists():
+            if not absPathLink.is_symlink():
+                absPathLink.symlink_to(pathFile)
+        else:
+            absPathLink.symlink_to(pathFile)
+        return str(absPathLink.name)
+
+    def clearDirByTemplate(pathDirLinks: str, template='link_*'):
+        """Удалить все файлы в директории, которые соответствуют шаблону `template`
+
+        По умолчанию, шаблон удаляет все символьные файлы, которые созданы через функцию `createLinkToFile`
+
+        :param pathLink: Путь к папке.
+        """
+        pLink = Path(pathDirLinks).resolve()
+        for f in pLink.glob(template):
+            os.remove(f)
+        return True
