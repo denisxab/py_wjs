@@ -92,7 +92,6 @@ class WbsHandle:
             for k, v in d.items():
                 if not k.startswith('_'):
                     setattr(self.allowed_func, v.__qualname__, v)
-        # Добавляем в основной класс полный список доступных функций с учетом наследования.
 
     async def after_init(self):
         # Если указан путь для кеша пользователя, то инициализируем таблицы для
