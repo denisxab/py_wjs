@@ -105,6 +105,7 @@ def step6(path_gitignore: Path):
 __pycache__
 log
 server/venv
+server/plagins
 *.log
 *.sqlite
     """)
