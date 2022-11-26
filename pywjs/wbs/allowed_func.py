@@ -6,10 +6,10 @@ from pywjs.wbs.schema import ClientsWbsRequest, DT_HelpAllowed, ServerWbsRespons
 # Возьмем "logger" который проинициализируется в `wbs_main_loop`
 import pywjs.wbs.server as baseWbs
 
-__all__ = ['UserWbsFunc','Transaction']
+__all__ = ['AllowWbsFunc', 'Transaction', 'StdAllowWbsFunc']
 
 
-class UserWbsFunc():
+class AllowWbsFunc():
     """
     Класс для реализации и хранения `доступных функций`
     """
@@ -125,3 +125,7 @@ class Transaction:
                 return res
             return transaction_dec
         return wrapper
+
+
+class StdAllowWbsFunc:
+    """Сборник функций для решения часто встречаемых задач, при создание десктопных программ"""

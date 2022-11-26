@@ -7,7 +7,7 @@ from typing import Optional
 from pydantic import ValidationError
 from websockets.legacy.server import WebSocketServerProtocol
 from pywjs.wbs.logger import ABC_logger
-from pywjs.wbs.allowed_func import Transaction, UserWbsFunc
+from pywjs.wbs.allowed_func import Transaction, AllowWbsFunc
 from pywjs.wbs.subscribe import UserWbsSubscribe
 from pywjs.wbs.cache import Cache
 from pywjs.wbs.schema import ClientsWbsRequest, ClientsWbsRequest_GetInfoServer_id, ClientsWbsRequest_Mod, ClientsWbsRequest_ModAlternatives, ServerWbsResponse, WbsResponseCode
@@ -34,7 +34,7 @@ class WbsHandle:
     @property
     @abc.abstractmethod
     # Класс для хранения доступных функций
-    def allowed_func(self) -> Optional[UserWbsFunc]: ...
+    def allowed_func(self) -> Optional[AllowWbsFunc]: ...
 
     @property
     @abc.abstractmethod
