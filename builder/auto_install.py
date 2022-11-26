@@ -87,17 +87,21 @@ def step5(path_run: Path, path_python: Path):
     # Относительный путь к venv
     path_python = re.sub('.+(venv.+)', '\g<1>', path_python)
     path_run.write_text(f"""
-from pathlib import Path
-import webbrowser
 import os
+import webbrowser
+from pathlib import Path
 
-sdir = Path(__file__).parent 
+from auto_update import check_update
+
+sdir = Path(__file__).parent
+
+# Проверить необходимость синхронизации и обновления
+check_update()
 # Запустить html файл, в браузере по умолчанию
 webbrowser.open(f"file://{{sdir / 'client' / 'index.html'}}")
 # Запустить файл `main.py`
 os.system(f"{{sdir / 'server' / '{path_python}'}} {{sdir /'server'/ 'main.py'}}")
     """)
-
 
 # 6. Создать `.gitignore`
 def step6(path_gitignore: Path):
@@ -112,8 +116,6 @@ server/plagins
     """)
 
 # 7. Создать файл для автоматического обновления
-
-
 def step7(path_auto_update: Path):
     path_auto_update.write_text('''
 """ 
@@ -124,6 +126,9 @@ import subprocess
 from datetime import datetime
 from auto_install import step3, path_server, path_python
 
+
+def check_update():
+    syncGit()
 
 def syncGit():
     """Синхронизация проекта"""
@@ -158,10 +163,10 @@ def syncGit():
         # Нет различий локальной ветки от удаленной. Или не удалось узнать различий с удаленной веткой, из за отсутствия связи.
         ...
 
+
 def syncPyVenvDependents():
     """Синхронизация зависимостей для виртуального окружения Python"""
     step3(path_python=path_python, path_server=path_server)
-
     ''')
 
 
