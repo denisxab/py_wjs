@@ -158,7 +158,6 @@ def syncGit():
         # Нет различий локальной ветки от удаленной. Или не удалось узнать различий с удаленной веткой, из за отсутствия связи.
         ...
 
-
 def syncPyVenvDependents():
     """Синхронизация зависимостей для виртуального окружения Python"""
     step3(path_python=path_python, path_server=path_server)
