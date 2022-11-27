@@ -5,6 +5,5 @@ venv
 .vscode
 *.sqlite
 /dist
-builder/builder/node_modules/*
-builder/builder/node_modules
+node_modules
 _tst.py
