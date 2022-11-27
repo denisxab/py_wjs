@@ -78,12 +78,12 @@ date updated: 2022-11-22 23:20
             */
             const command = "2+2";
             wbs_obj.send({
-                mod: ClientsWbsRequest_Mod.exe,
-                h_id: 99,
-                uid_c: 0,
-                body: {
-                    exec: command,
-                },
+              mod: ClientsWbsRequest_Mod.exe,
+              h_id: 99,
+              uid_c: 0,
+              body: {
+                exec: command,
+              },
             });
         },
         // Функция для получения сообщений от сервера
@@ -96,11 +96,11 @@ date updated: 2022-11-22 23:20
             */
             const response_obj = <ServerWbsResponse>JSON.parse(event.data);
             switch (response_obj.h_id) {
-                case 99:
-                    {
-                        console.log(response_obj.response);
-                    }
-                    break;
+              case 99:
+              {
+                console.log(response_obj.response);
+              }
+              break;
             }
             /* wbs_obj.close(WbsCloseStatus.normal,'Пример Закрытия Соединения') */
         },
@@ -141,12 +141,12 @@ date updated: 2022-11-22 23:20
       ```ts
       beforeCreate() {
         this.$store.dispatch("wbs/initWebSocket", {
-            // Что сделать после успешного подключения к серверу.
-            after_connect: () => {
-                // Тут отправляем первые сообщения на сервер.
-            },
-            // Обработка события window.beforeunload(закрытия/перезагрузка страницы). Здесь можно выполнять отчистку ресурсов.
-            destruction:()=>{}
+          // Что сделать после успешного подключения к серверу.
+          after_connect: () => {
+            // Тут отправляем первые сообщения на сервер.
+          },
+          // Обработка события window.beforeunload(закрытия/перезагрузка страницы). Здесь можно выполнять отчистку ресурсов.
+          destruction:()=>{}
         });
       },
       ```
@@ -158,18 +158,18 @@ date updated: 2022-11-22 23:20
      ```ts
      actions: {
         ЛюбоеИмя({dispatch}){
-            dispatch(
-                "wbs/send",
-                {
-                    // ПРИМЕР
-                    mod: ClientsWbsRequest_Mod.exec,
-                    h_id: 1,
-                    body: {
-                        exec = "2+2",
-                    },
-                },
-                { root: true }
-            );
+          dispatch(
+            "wbs/send",
+            {
+              // ПРИМЕР
+              mod: ClientsWbsRequest_Mod.exec,
+              h_id: 1,
+              body: {
+                exec = "2+2",
+              },
+            },
+            { root: true }
+          );
         }
      }
      ```
@@ -179,14 +179,14 @@ date updated: 2022-11-22 23:20
      ```ts
      methods: {
         ЛюбоеИмя(){
-            this.$store.dispatch("wbs/send", {
-                // ПРИМЕР
-                mod: ClientsWbsRequest_Mod.exec,
-                h_id: 1,
-                body: {
-                    exec = "2+2",
-                },
-            });
+          this.$store.dispatch("wbs/send", {
+            // ПРИМЕР
+            mod: ClientsWbsRequest_Mod.exec,
+            h_id: 1,
+            body: {
+              exec = "2+2",
+            },
+          });
         }
      }
      ```
@@ -198,8 +198,8 @@ date updated: 2022-11-22 23:20
      ```ts
      getters: {
         ЛюбоеИмя(rootState) {
-            const r=rootState.wbs.res.value[1]
-            return r ? r : {};
+          const r=rootState.wbs.res.value[1]
+          return r ? r : {};
         }
      }
      ```
@@ -209,8 +209,8 @@ date updated: 2022-11-22 23:20
      ```ts
      computed: {
         ЛюбоеИмя() {
-            const r=this.$store.state.wbs.res.value[1]
-            return r ? r : {};
+          const r=this.$store.state.wbs.res.value[1]
+          return r ? r : {};
         }
      }
      ```
@@ -226,7 +226,7 @@ date updated: 2022-11-22 23:20
    ```ts
    import { ClassHID } from "wbs/wbs";
    export const Алиасы = new ClassHID({
-       Алиас: Число_h_id,
+      Алиас: Число_h_id,
    });
    ```
 
@@ -261,18 +261,18 @@ date updated: 2022-11-22 23:20
       <PyjsLog :hids="hids" />
   </template>
   <script lang="ts">
-    import PyjsLog from "@/components/pyjs_log.vue";
-    import { Алиасы } from "./store/Хранилище";
-    export default {
-        components: { PyjsLog },
-        data() {
-            return {
-                // Алиасы для h_id. Об этом написаны в главе [-> Использование алиасов для h_id]]
-                // Можно не указывать, тогда вместо алиасов будут `h_id.`
-                hids: Алиасы,
-            };
-        },
-    };
+  import PyjsLog from "@/components/pyjs_log.vue";
+  import { Алиасы } from "./store/Хранилище";
+  export default {
+    components: { PyjsLog },
+    data() {
+      return {
+        // Алиасы для h_id. Об этом написаны в главе [-> Использование алиасов для h_id]]
+        // Можно не указывать, тогда вместо алиасов будут `h_id.`
+        hids: Алиасы,
+      };
+    },
+  };
   </script>
   ```
 
@@ -294,7 +294,7 @@ date updated: 2022-11-22 23:20
     h_id: 99,
     // uid_c:  Автоматически сгенерируется
     body: {
-    exec = "2+2",
+      exec = "2+2",
     },
     // t_send: Автоматически сгенерируется
   });
@@ -314,19 +314,19 @@ date updated: 2022-11-22 23:20
 
   ```ts
   wbs_obj.send_transaction(
-      {
-        mod: ClientsWbsRequest_Mod.func,
-        h_id: 99,
-        body: {
-            n_func: "os_exe_async", // Имя функцию которую вызвать
-            args: ["ls"], // Позиционные аргументы
-            kwargs: undefined, // Именованные аргументы
-        },
+    {
+      mod: ClientsWbsRequest_Mod.func,
+      h_id: 99,
+      body: {
+        n_func: "os_exe_async", // Имя функцию которую вызвать
+        args: ["ls"], // Позиционные аргументы
+        kwargs: undefined, // Именованные аргументы
       },
-      // Это функция `rollback`
-      (error_code: TRollbackErrorCode, h_id: number, uid_c: number) => {
-        alter("Rollback");
-      }
+    },
+    // Это функция `rollback`
+    (error_code: TRollbackErrorCode, h_id: number, uid_c: number) => {
+      alter("Rollback");
+    }
   );
   ```
 
@@ -341,27 +341,27 @@ date updated: 2022-11-22 23:20
   Таким образом можно сохранять состояние приложения на диске(для душнил=на запоминающем устройстве).
   */
   wbs_obj.send_before({
-      // ПЕРВЫЙ ЗАПРОС
-      mod: ClientsWbsRequest_Mod.cache_read_key,
-      h_id: 87,
-      body: {
-        // Например: получаем путь к папке, в котрой пользователь был до закрытия страницы.
-        key: "ПрошлыйПуть",
-      },
-      // ВТОРОЙ ЗАПРОС
-      before: (last_res: ServerWbsResponse) => {
-        // Получаем прошлый путь из кеша
-        const last_path = JSON.parse(last_res);
-        wbs_obj.send({
-            mod: ClientsWbsRequest_Mod.func,
-            h_id: 99,
-            body: {
-                // Например: Получим все файлы в указанной директории
-                n_func: "ФункцияДляПолученияФайлов",
-                kwargs: { path: last_path.response },
-            },
-        });
-      },
+    // ПЕРВЫЙ ЗАПРОС
+    mod: ClientsWbsRequest_Mod.cache_read_key,
+    h_id: 87,
+    body: {
+      // Например: получаем путь к папке, в котрой пользователь был до закрытия страницы.
+      key: "ПрошлыйПуть",
+    },
+    // ВТОРОЙ ЗАПРОС
+    before: (last_res: ServerWbsResponse) => {
+      // Получаем прошлый путь из кеша
+      const last_path = JSON.parse(last_res);
+      wbs_obj.send({
+        mod: ClientsWbsRequest_Mod.func,
+        h_id: 99,
+        body: {
+          // Например: Получим все файлы в указанной директории
+          n_func: "ФункцияДляПолученияФайлов",
+          kwargs: { path: last_path.response },
+        },
+      });
+    },
   });
   ```
 
@@ -426,19 +426,19 @@ date updated: 2022-11-22 23:20
 
 ```ts
 function main() {
-    // VVVV Вот тут пишем запросы для сервера VVVV
-    //                                          //
-    // ^^^^ Вот тут пишем запросы для сервера ^^^^
+  // VVVV Вот тут пишем запросы для сервера VVVV
+  //                                          //
+  // ^^^^ Вот тут пишем запросы для сервера ^^^^
 }
 
 const wbs_obj = new Wbs("ЛюбойТокенКоторыйВыРазрешилиНаСервере", {
-    host: "localhost",
-    port: 9999,
-    callback_onopen: main,
-    callback_onmessage: (event: MessageEvent) => {
-        // Выводим ответ сервера в консоль
-        console.log(<ServerWbsResponse>JSON.parse(event.data), null, 2);
-    },
+  host: "localhost",
+  port: 9999,
+  callback_onopen: main,
+  callback_onmessage: (event: MessageEvent) => {
+    // Выводим ответ сервера в консоль
+    console.log(<ServerWbsResponse>JSON.parse(event.data), null, 2);
+  },
 });
 ```
 
@@ -480,7 +480,7 @@ wbs_obj.send({
     mod: ClientsWbsRequest_Mod.import_from_server,
     h_id: 81,
     body: {
-        import_sts_exe: command, // Команда
+      import_sts_exe: command, // Команда
     },
 });
 ```
@@ -494,8 +494,8 @@ wbs_obj.send({
     mod: ClientsWbsRequest_Mod.info,
     h_id: 82,
     body: {
-        id_r: ClientsWbsRequest_GetInfoServer_id.help_allowed, // О чем информацию
-        text: undefined, // Дополнительные текст
+      id_r: ClientsWbsRequest_GetInfoServer_id.help_allowed, // О чем информацию
+      text: undefined, // Дополнительные текст
     },
 });
 ```
@@ -519,9 +519,9 @@ wbs_obj.send({
     mod: ClientsWbsRequest_Mod.func,
     h_id: 83,
     body: {
-        n_func: "getFileFromPath", // Имя функцию которую вызвать
-        args: undefined, // Позиционные аргументы
-        kwargs: { path: "/home" }, // Именованные аргументы
+      n_func: "getFileFromPath", // Имя функцию которую вызвать
+      args: undefined, // Позиционные аргументы
+      kwargs: { path: "/home" }, // Именованные аргументы
     },
   });
   ```
@@ -533,9 +533,9 @@ wbs_obj.send({
     mod: ClientsWbsRequest_Mod.func,
     h_id: 84,
     body: {
-        n_func: "os_exe_async", // Имя функцию которую вызвать
-        args: ["ls"], // Позиционные аргументы
-        kwargs: undefined, // Именованные аргументы
+      n_func: "os_exe_async", // Имя функцию которую вызвать
+      args: ["ls"], // Позиционные аргументы
+      kwargs: undefined, // Именованные аргументы
     },
   });
   ```
@@ -551,10 +551,10 @@ wbs_obj.send({
     mod: ClientsWbsRequest_Mod.event_create,
     h_id: 85,
     body: {
-        n_func: "watchDir", // Имя функции которая отслеживает событие на сервере
-        mod: "dubl", // Модификация событие
-        args: ["/home"], // Позиционные аргументы
-        kwargs: undefined, // Именованные аргументы
+      n_func: "watchDir", // Имя функции которая отслеживает событие на сервере
+      mod: "dubl", // Модификация событие
+      args: ["/home"], // Позиционные аргументы
+      kwargs: undefined, // Именованные аргументы
     },
 });
 ```
@@ -570,8 +570,8 @@ wbs_obj.send({
     mod: ClientsWbsRequest_Mod.event_sub,
     h_id: 86,
     body: {
-        n_func: "watchDir", // Имя функции которая отслеживает событие на сервере
-        mod: "dubl", // Модификация событие
+      n_func: "watchDir", // Имя функции которая отслеживает событие на сервере
+      mod: "dubl", // Модификация событие
     },
 });
 ```
@@ -587,8 +587,8 @@ wbs_obj.send({
     mod: ClientsWbsRequest_Mod.event_sub,
     h_id: 86,
     body: {
-        n_func: "watchDir", // Имя функции которая отслеживает событие на сервере
-        mod: "dubl", // Модификация событие
+      n_func: "watchDir", // Имя функции которая отслеживает событие на сервере
+      mod: "dubl", // Модификация событие
     },
 });
 ```
@@ -622,10 +622,10 @@ wbs_obj.send({
     mod: ClientsWbsRequest_Mod.cache_add_key,
     h_id: 87,
     body: {
-        key:"ИмяКлюча"
-        value:JSON.stringify(ЗначениеКлюча)
-        // Если не указан, то возьмется из конструктора  `new Wbs(user="ИмяПользователя")`, если такого пользователя не существет, то создастся новый.
-        // user: "ИмяПользователя"
+      key:"ИмяКлюча"
+      value:JSON.stringify(ЗначениеКлюча)
+      // Если не указан, то возьмется из конструктора  `new Wbs(user="ИмяПользователя")`, если такого пользователя не существет, то создастся новый.
+      // user: "ИмяПользователя"
     }
   });
   ```
@@ -637,9 +637,9 @@ wbs_obj.send({
     mod: ClientsWbsRequest_Mod.cache_read_key,
     h_id: 87,
     body: {
-        key: "ИмяКлюча",
-        // Если не указан, то возьмется из конструктора  `new Wbs(user="ИмяПользователя")`, если такого пользователя не существет, то будет ошибка.
-        // user: "ИмяПользователя"
+      key: "ИмяКлюча",
+      // Если не указан, то возьмется из конструктора  `new Wbs(user="ИмяПользователя")`, если такого пользователя не существет, то будет ошибка.
+      // user: "ИмяПользователя"
     },
   });
   ```
@@ -704,58 +704,58 @@ class МоиФункции(AllowWbsFunc):
 
     # Асинхронная функция
     async def os_exe_async(command: str) -> dict:
-        """
-        Выполнить асинхронно команды(command) в bash.
-        """
-        # Выполняем команду
-        p = await create_subprocess_shell(
-            cmd=command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-        # Получить результат выполнения команды
-        stdout, stderr = await p.communicate()
-        return dict(
-            stdout=stdout.decode(),
-            stderr=stderr.decode(),
-            cod=p.returncode,
-            cmd=command,
-        )
+      """
+      Выполнить асинхронно команды(command) в bash.
+      """
+      # Выполняем команду
+      p = await create_subprocess_shell(
+        cmd=command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+      )
+      # Получить результат выполнения команды
+      stdout, stderr = await p.communicate()
+      return dict(
+        stdout=stdout.decode(),
+        stderr=stderr.decode(),
+        cod=p.returncode,
+        cmd=command,
+      )
 
     # Синхронная функция
     def getFileFromPath(path: str) -> str:
-        """
-        Получить информацию о файлах и директориях по указанному пути `path`
-        """
-        res = {}
-        for x in os.scandir(path):
-            tmp = {}
-            type_f = None
-            try:
-                d: os.stat_result = x.stat()
-                tmp['st_size'] = d.st_size  # Размер в байтах
-                tmp['date_create'] = datetime.utcfromtimestamp(
-                    int(d.st_ctime)).strftime('%Y-%m-%d %H:%M:%S')  # Дата создания
-                tmp['date_update'] = datetime.utcfromtimestamp(
-                    int(d.st_mtime)).strftime('%Y-%m-%d %H:%M:%S')  # Дата изменения
-                tmp['user'] = pwd.getpwuid(d.st_uid).pw_name  # Пользователь
-                tmp['group'] = grp.getgrgid(d.st_gid).gr_name  # Группа
-                tmp['chmod'] = stat.S_IMODE(d.st_mode)  # Доступ к файлу
-            except FileNotFoundError:
-                tmp['st_size'] = 0
-                tmp['date_create'] = 0
-                tmp['date_update'] = 0
-                tmp['user'] = 0
-                tmp['group'] = 0
-                tmp['chmod'] = 0
-                type_f = 'file'
-            if x.is_file():
-                type_f = 'file'
-            elif x.is_dir():
-                type_f = 'dir'
-            tmp['type_f'] = type_f
-            res[x.name] = tmp
-        return res
+      """
+      Получить информацию о файлах и директориях по указанному пути `path`
+      """
+      res = {}
+      for x in os.scandir(path):
+        tmp = {}
+        type_f = None
+        try:
+          d: os.stat_result = x.stat()
+          tmp['st_size'] = d.st_size  # Размер в байтах
+          tmp['date_create'] = datetime.utcfromtimestamp(
+              int(d.st_ctime)).strftime('%Y-%m-%d %H:%M:%S')  # Дата создания
+          tmp['date_update'] = datetime.utcfromtimestamp(
+              int(d.st_mtime)).strftime('%Y-%m-%d %H:%M:%S')  # Дата изменения
+          tmp['user'] = pwd.getpwuid(d.st_uid).pw_name  # Пользователь
+          tmp['group'] = grp.getgrgid(d.st_gid).gr_name  # Группа
+          tmp['chmod'] = stat.S_IMODE(d.st_mode)  # Доступ к файлу
+        except FileNotFoundError:
+          tmp['st_size'] = 0
+          tmp['date_create'] = 0
+          tmp['date_update'] = 0
+          tmp['user'] = 0
+          tmp['group'] = 0
+          tmp['chmod'] = 0
+          type_f = 'file'
+        if x.is_file():
+          type_f = 'file'
+        elif x.is_dir():
+          type_f = 'dir'
+        tmp['type_f'] = type_f
+        res[x.name] = tmp
+      return res
 ```
 
 Пихать все функции в один класс не удобной, поэтому есть механизм для расширения доступных функций, путем множественного наследования. Это выглядит так:
@@ -790,14 +790,14 @@ class МоиФункции(AllowWbsFunc):
 
     @Transaction._(rollback=lambda: '!! Произошёл rollback на стороне сервера !!')
     async def readFile(path: str:
-        """
-        Прочесть файл
-        """
-        p = Path(path)
-        if not p.exists():
-            raise Transaction.TransactionError('Файл не существует.')
-        else:
-            return p.read_text()
+      """
+      Прочесть файл
+      """
+      p = Path(path)
+      if not p.exists():
+        raise Transaction.TransactionError('Файл не существует.')
+      else:
+        return p.read_text()
 ```
 
 Клиент:
@@ -807,24 +807,24 @@ const path = "/home/ФайлКоторогоНет";
 wbs_obj.send_transaction(
     // Это основной запрос
     {
-        mod: ClientsWbsRequest_Mod.func,
-        h_id: 99,
-        body: {
-            n_func: "readFile", // Имя функцию которую вызвать
-            args: [path],       // Позиционные аргументы
-        },
+      mod: ClientsWbsRequest_Mod.func,
+      h_id: 99,
+      body: {
+        n_func: "readFile", // Имя функцию которую вызвать
+        args: [path],       // Позиционные аргументы
+      },
     },
     // Это функция `rollback`
     <TRollback>(
-        error_code: TRollbackErrorCode,
-        h_id: number,
-        uid_c: number,
-        res_server_json: ServerWbsResponse
+      error_code: TRollbackErrorCode,
+      h_id: number,
+      uid_c: number,
+      res_server_json: ServerWbsResponse
     ) => {
         alter(`Rollback: ошибка обработки файл "${path}"`);
         if (error_code == TRollbackErrorCode.error_server) {
-            // Текст ошибки на сервере
-            alter(res_server_json.error);
+          // Текст ошибки на сервере
+          alter(res_server_json.error);
         }
     }
 );
@@ -837,7 +837,7 @@ wbs_obj.send_transaction(
   async def ИмяФункции(*args, **kwargs):
     ... # Что то делаем.
     if ... : # Что то пошло не так.
-        raise Transaction.TransactionError('СообщениеДляКлиента') # Вызываем ошибку в транзакции.
+      raise Transaction.TransactionError('СообщениеДляКлиента') # Вызываем ошибку в транзакции.
     return ... # Если все хорошо, возвращаем ответ.
   ```
 
@@ -877,10 +877,10 @@ class МоиФункции(AllowWbsFunc,StdAllowWbsFunc):
         """
         pre = [] # Инициализация локальных переменных
         while await self_.live(sleep=2): # Бесконечный не блокирующий цикл событий, которые будет выполнятся через каждые `sleep`
-            f = os.listdir(path) # Отслеживания события
-            if pre != f: # Условия срабатывания события
-                pre = f
-                await self_.send(f) # Отправка сообщения всем подписчикам для указанной модификации
+          f = os.listdir(path) # Отслеживания события
+          if pre != f: # Условия срабатывания события
+            pre = f
+            await self_.send(f) # Отправка сообщения всем подписчикам для указанной модификации
   ```
 
   Шаблон отслеживания "события на сервере"
@@ -889,9 +889,9 @@ class МоиФункции(AllowWbsFunc,StdAllowWbsFunc):
   async def ИмяФункции(self_, path: str):
     ... # Инициализация локальных переменных
     while await self_.live(sleep=СколькоЖдать): # Бесконечный не блокирующий цикл событий, которые будет выполнятся через каждые `sleep`
-        ... # Отслеживания события
-        if ... : # Условия срабатывания события
-            await self_.send(...)  # Отправка сообщения всем подписчикам для указанной модификации
+      ... # Отслеживания события
+      if ... : # Условия срабатывания события
+        await self_.send(...)  # Отправка сообщения всем подписчикам для указанной модификации
   ```
 
 ### Кеш пользователей
@@ -1083,8 +1083,8 @@ Eсли вам нужно отключить логирование(игнори
       fetch(pathLink)
         .then((response) => response.text())
         .then((text) => {
-            // @ts-ignore
-            this.textFile = text;
+          // @ts-ignore
+          this.textFile = text;
         });
     }
     textDiv = readFile("Путь.txt");
