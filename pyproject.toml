@@ -12,7 +12,7 @@ jsonpickle = "2.2.0"
 websockets = "^10.4"
 pydantic = "^1.10.2"
 aiosqlite = "^0.17.0"
-logsmal = "0.0.14"
+logsmal = ">=0.0.15"
 
 [build-system]
 requires = ["poetry-core"]

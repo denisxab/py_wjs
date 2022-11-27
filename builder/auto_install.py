@@ -96,12 +96,13 @@ from auto_update import check_update
 sdir = Path(__file__).parent
 
 # Проверить необходимость синхронизации и обновления
-check_update()
+check_update(only_info=False)
 # Запустить html файл, в браузере по умолчанию
 webbrowser.open(f"file://{{sdir / 'client' / 'index.html'}}")
 # Запустить файл `main.py`
 os.system(f"{{sdir / 'server' / '{path_python}'}} {{sdir /'server'/ 'main.py'}}")
     """)
+
 
 # 6. Создать `.gitignore`
 def step6(path_gitignore: Path):
@@ -115,6 +116,7 @@ server/plagins
 *.sqlite
     """)
 
+
 # 7. Создать файл для автоматического обновления
 def step7(path_auto_update: Path):
     path_auto_update.write_text('''
@@ -127,10 +129,13 @@ from datetime import datetime
 from auto_install import step3, path_server, path_python
 
 
-def check_update():
-    syncGit()
+def check_update(only_info=True):
+    syncGit(only_info=only_info)
 
-def syncGit():
+def syncGit(only_info=True):
+    """
+    only_info: Если True, то тогда только проинформировать о различиях, и не пытаться(откатиться/обновиться)
+    """
     """Синхронизация проекта"""
     origin = 'origin'
     # Получить имя текущей ветки, оно будет считаться именем для удаленной ветки.
@@ -148,16 +153,19 @@ def syncGit():
         #
         # Если есть различия в локальной и удаленной ветки
         #
+        print('GitReset')
+        if only_info:
+            print('OnlyInfo')
+            return False
         # Делаем коммит текущих локальных изменений.
         subprocess.run('git add -A', shell=True, check=True)
         subprocess.run(
-            f"git commit -m 'CommitByAutoUpdate:{datetime.now()}'", shell=True,check=True)
+            f"git commit -m 'CommitByAutoUpdate:{datetime.now()}'", shell=True, check=True)
         # Получаем всю информацию об изменениях на удаленной ветки.
         subprocess.run('git fetch --all', shell=True, check=True)
         # Принудительно(во всех спорных случая берем данные из удаленной ветки) синхронизируем локальную ветку с удаленной.
         subprocess.run(
             f'git reset --hard {origin}/{select_branch}', shell=True)
-        print('GitReset')
         # Выполняем синхронизацию зависимостей в виртуальном окружение `Python`
         syncPyVenvDependents()
     else:
@@ -167,7 +175,6 @@ def syncGit():
 def syncPyVenvDependents():
     """Синхронизация зависимостей для виртуального окружения Python"""
     step3(path_python=path_python, path_server=path_server)
-
     ''')
 
 
