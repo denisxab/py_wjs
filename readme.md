@@ -782,17 +782,16 @@ class МоиФункции(AllowWbsFunc,ДругойКласс_1,ДругойК�
 from pywjs.wbs.allowed_func import Transaction, AllowWbsFunc
 
 class МоиФункции(AllowWbsFunc):
-
-    @Transaction._(rollback=lambda: '!! Произошёл rollback на стороне сервера !!')
-    async def readFile(path: str:
-      """
-      Прочесть файл
-      """
-      p = Path(path)
-      if not p.exists():
-        raise Transaction.TransactionError('Файл не существует.')
-      else:
-        return p.read_text()
+  @Transaction._(rollback=lambda: '!! Произошёл rollback на стороне сервера !!')
+  async def readFile(path: str:
+    """
+    Прочесть файл
+    """
+    p = Path(path)
+    if not p.exists():
+      raise Transaction.TransactionError('Файл не существует.')
+    else:
+      return p.read_text()
 ```
 
 Клиент:
@@ -800,28 +799,28 @@ class МоиФункции(AllowWbsFunc):
 ```ts
 const path = "/home/ФайлКоторогоНет";
 wbs_obj.send_transaction(
-    // Это основной запрос
-    {
-      mod: ClientsWbsRequest_Mod.func,
-      h_id: 99,
-      body: {
-        n_func: "readFile", // Имя функцию которую вызвать
-        args: [path],       // Позиционные аргументы
-      },
+  // Это основной запрос
+  {
+    mod: ClientsWbsRequest_Mod.func,
+    h_id: 99,
+    body: {
+      n_func: "readFile", // Имя функцию которую вызвать
+      args: [path],       // Позиционные аргументы
     },
-    // Это функция `rollback`
-    <TRollback>(
-      error_code: TRollbackErrorCode,
-      h_id: number,
-      uid_c: number,
-      res_server_json: ServerWbsResponse
-    ) => {
-        alter(`Rollback: ошибка обработки файл "${path}"`);
-        if (error_code == TRollbackErrorCode.error_server) {
-          // Текст ошибки на сервере
-          alter(res_server_json.error);
-        }
-    }
+  },
+  // Это функция `rollback`
+  <TRollback>(
+    error_code: TRollbackErrorCode,
+    h_id: number,
+    uid_c: number,
+    res_server_json: ServerWbsResponse
+  ) => {
+      alter(`Rollback: ошибка обработки файл "${path}"`);
+      if (error_code == TRollbackErrorCode.error_server) {
+        // Текст ошибки на сервере
+        alter(res_server_json.error);
+      }
+  }
 );
 ```
 
@@ -867,15 +866,15 @@ class МоиФункции(AllowWbsFunc,StdAllowWbsFunc):
 
   class МоиПодписки(UserWbsSubscribe):
     async def watchDir(self_, path: str):
-        """
-        Отслеживание изменений файлов и директорий в пути `path`
-        """
-        pre = [] # Инициализация локальных переменных
-        while await self_.live(sleep=2): # Бесконечный не блокирующий цикл событий, которые будет выполнятся через каждые `sleep`
-          f = os.listdir(path) # Отслеживания события
-          if pre != f: # Условия срабатывания события
-            pre = f
-            await self_.send(f) # Отправка сообщения всем подписчикам для указанной модификации
+      """
+      Отслеживание изменений файлов и директорий в пути `path`
+      """
+      pre = [] # Инициализация локальных переменных
+      while await self_.live(sleep=2): # Бесконечный не блокирующий цикл событий, которые будет выполнятся через каждые `sleep`
+        f = os.listdir(path) # Отслеживания события
+        if pre != f: # Условия срабатывания события
+          pre = f
+          await self_.send(f) # Отправка сообщения всем подписчикам для указанной модификации
   ```
 
   Шаблон отслеживания "события на сервере"
