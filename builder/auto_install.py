@@ -39,6 +39,7 @@ def step1(path_app: Path):
             path_python=path_python
         )
         step6(path_gitignore=path_app/'.gitignore')
+        step7(path_auto_update=path_app/'auto_update.py')
     else:
         print(
             f"Версия Python не подходит, необходимо иметь Python{setting['major']}.{setting['minor']}\nСсылка для скачивания:\t{setting['download_link']}")
@@ -142,13 +143,13 @@ def syncGit(only_info=True):
     select_branch: str = subprocess.run(
         'git --no-pager branch --no-color --show-current', shell=True,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8'
-    ).stdout.replace('\n', '')
+    ).stdout.replace('\\n', '')
     if not select_branch:
         raise ValueError("Пустая ветка")
     # Проверить синхронизацию текущего локального проекта(даже если изменения небыли за комичены), с удаленной веткой.
     diff: str = subprocess.run(
         f'git --no-pager diff {origin}/{select_branch} --raw --name-status', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8'
-    ).stdout.replace('\n', '')
+    ).stdout.replace('\\n', '')
     if diff:
         #
         # Если есть различия в локальной и удаленной ветки
